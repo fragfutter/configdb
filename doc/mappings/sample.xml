@@ -1,0 +1,14 @@
+<section_a>
+    <key_bool>True</key_bool>
+    <key_int>42</key_int>
+    <key_string>Hello World</key_string>
+    <key_list>
+        <value>val1</value>
+        <value>val2</value>
+        <value>val3</value>
+    </key_list>
+    <key_hash>
+        <foo>val4</foo>
+        <bar>val5</foo>
+    </key_hash>
+<section_a>

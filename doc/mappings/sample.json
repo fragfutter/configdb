@@ -1,0 +1,11 @@
+{
+  "section_a": {
+   "key_bool": true,
+   "key_int": 42,
+   "key_string": "Hello World",
+   "key_list": ["val1", "val2", "val3"],
+   "key_hash": {
+     "foo": "val4",
+     "bar": "val5"
+   }
+}
