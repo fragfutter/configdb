@@ -25,6 +25,7 @@ goal provide a restful interface to configuration data
   * global defaults
   * inheritance
   * allow file format options (for example: equal sign or colon in ini)
+  * file format shell variables 
 
 ### questions
 if the base format is a json or yaml like format. How to store xml node attributes. Should xml nodes always be 

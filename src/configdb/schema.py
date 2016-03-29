@@ -42,12 +42,57 @@ class Node(db.Model):
 
     @property
     def val(self):
-        print('val is %s' % self.stringval)
-        return getattr(self, self.type + 'val')
+        if self.type in ('bool', 'int', 'float', 'string'):
+            return getattr(self, self.type + 'val')
+        else:
+            return None
 
     @val.setter
     def val(self, val):
-        setattr(self, self.type + 'val', val)
+        # clear old values
+        self.boolval = None
+        self.intval = None
+        self.floatval = None
+        self.stringval = None
+        self.blobval = None
+        if self.type in ('bool', 'int', 'float', 'string'):
+            setattr(self, self.type + 'val', val)
+
+    @classmethod
+    def root(cls):
+        """return root node"""
+        result = cls.query.filter_by(label='root', parent_id=None).first()
+        return result
+
+    @classmethod
+    def fetch_by_path(cls, path, create=False):
+        parent = cls.root()
+        if not path:
+            return parent
+        for element in filter(None, path.split('/')):
+            if parent.type not in ('dict', 'list'):
+                raise Exception("path %s contains leaf element %s" % (path, parent.label))
+            node = cls.query.filter_by(label=element, parent=parent).first()
+            if not node:
+                if create:
+                    node = Node(element, parent=parent)
+                    node.type = 'dict'
+                    db.session.add(node)
+                else:
+                    return None
+            parent = node
+        return parent
+
+    @classmethod
+    def get_by_path(cls, path):
+        """start at the root node, walk the path and
+        return the node matching"""
+        return cls.fetch_by_path(path, create=False)
+
+    @classmethod
+    def create_path(cls, path, create=True):
+        """create all intermediate notes up to path"""
+        return cls.fetch_by_path(path, create=True)
 
     def __repr__(self):
         return '<Node %s: %s>' % (self.id, self.label)
@@ -58,7 +103,6 @@ db.create_all()
 root = Node.query.filter_by(label='root', parent_id=None).first()
 if not root:
     root = Node('root')
+    root.type = 'dict'
     db.session.add(root)
     db.session.commit()
-
-print('configdb.schema')

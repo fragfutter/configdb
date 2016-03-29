@@ -1,0 +1,8 @@
+boolean: true
+float: 1.2
+integer: 42
+list: [a, list, of, words, 42]
+nested:
+  nested list: [42, 43, 44]
+  string: nested yaml 2 string
+string: a string

@@ -1,0 +1,21 @@
+{
+  "list": [
+    "a",
+    "list",
+    "of",
+    "words",
+    42
+  ],
+  "nested": {
+    "string": "nested string",
+    "nested list": [
+      42,
+      43,
+      44
+    ]
+  },
+  "string": "a string",
+  "boolean": true,
+  "float": 1.2,
+  "integer": 42
+}
