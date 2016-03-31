@@ -2,62 +2,53 @@ from configdb.schema import Node
 from configdb.errors import DecodeException, InvalidPath
 import json
 import yaml
+import re
+from configdb.propertyparser import PropertyParser
+
+pat_prop = re.compile('\s*([^#!:=]+)(?:\s*[\s=:]\s*)(.*$)')
 
 
 class Formatter(object):
-    def __init__(self):
-        self.data = None
-
-    @classmethod
-    def load_node(cls, node):
-        if node.children:
-            result = {}
-            for child in node.children:
-                result[child.label] = cls.load_node(child)
-            if node.type == 'list':
-                # drop indices and convert to list
-                result = [result[i] for i in sorted(result)]
-        else:
-            result = node.val
-        return result
-
-    def load(self, path):
-        """load data from database"""
-        self.data = None
-        node = Node.get_by_path(path)
-        if not node:
+    def __init__(self, path, create=False):
+        self.node = Node.fetch_by_path(path, create=create)
+        if not self.node:
             raise InvalidPath("path %s does not exist" % path)
-        self.data = self.load_node(node)
 
     @property
     def json(self):
-        return json.dumps(self.data, indent=2)
+        return json.dumps(self.node.unpickle(), indent=2)
 
     @json.setter
     def json(self, data):
         try:
-            self.data = json.loads(data)
+            data = json.loads(data)
         except json.JSONDecodeError as e:
             raise DecodeException(e)
+        self.node.pickle(data)
 
     @property
     def yaml(self):
-        return yaml.dump(self.data)
+        return yaml.dump(self.node.unpickle())
 
     @yaml.setter
     def yaml(self, data):
         try:
-            self.data = yaml.load(data)
+            data = yaml.load(data)
         except yaml.scanner.ScannerError as e:
             raise DecodeException(e)
+        self.node.pickle(data)
 
     @property
     def prop(self):
-        pass
+        p = PropertyParser(self.node.unpickle())
+        return p.dump()
 
     @prop.setter
     def prop(self, data):
-        pass
+        # TODO find or write a save properties parser
+        p = PropertyParser(data)
+        p.load(data)
+        self.node.pickle(p.data)
 
     @property
     def ini(self):
@@ -65,4 +56,8 @@ class Formatter(object):
 
     @ini.setter
     def ini(self, data):
+        pass
+
+    @property
+    def value(self):
         pass

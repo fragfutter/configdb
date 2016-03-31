@@ -1,0 +1,13 @@
+boolean = true
+float = 1.2
+integer = 42
+list.0 = "a"
+list.1 = "list"
+list.2 = "of"
+list.3 = "words"
+list.4 = 42
+nested.nested list.0 = 42
+nested.nested list.1 = 43
+nested.nested list.2 = 44
+nested.string = "nested yaml 2 string"
+string = "a string"

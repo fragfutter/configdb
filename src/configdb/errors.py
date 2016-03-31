@@ -10,6 +10,11 @@ class InvalidPath(Exception):
     pass
 
 
+class NotALeaf(Exception):
+    """trying to access a branch node in leaf context"""
+    pass
+
+
 class HttpException(Exception):
     def __init__(self, message, code=400, **kwargs):
         self.message = str(message)
