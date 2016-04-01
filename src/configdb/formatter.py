@@ -1,4 +1,5 @@
-from configdb.schema import Node
+# from configdb.schema import Node
+from configdb.node import Node
 from configdb.errors import DecodeException, InvalidPath
 import json
 import yaml
@@ -10,7 +11,7 @@ pat_prop = re.compile('\s*([^#!:=]+)(?:\s*[\s=:]\s*)(.*$)')
 
 class Formatter(object):
     def __init__(self, path, create=False):
-        self.node = Node.fetch_by_path(path, create=create)
+        self.node = Node.by_path(path, create=create)
         if not self.node:
             raise InvalidPath("path %s does not exist" % path)
 

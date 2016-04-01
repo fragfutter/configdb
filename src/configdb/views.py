@@ -2,7 +2,7 @@ from configdb.meta import app
 from configdb.meta import db
 from configdb.errors import HttpException, DecodeException, InvalidPath
 from configdb.formatter import Formatter
-from flask import request, Response
+from flask import request, Response, render_template
 from flask.views import MethodView
 
 
@@ -10,7 +10,7 @@ mimes = {
     'application/json': 'json',
     'application/xml': 'xml',
     'text/plain': 'value',
-    'text/html': 'value',
+    'text/html': 'html',
     'application/properties': 'prop',
     'application/yaml': 'yaml',
 }
@@ -31,7 +31,7 @@ def get_response_format():
     except KeyError:
         pass
     # otherwise determine it from accept mime types header
-    default = 'text/plain'
+    default = 'text/html'
     keys = [default, ]
     keys.extend(mimes.keys())
     best = request.accept_mimetypes.best_match(
@@ -59,6 +59,15 @@ class NodeAPIv1(MethodView):
         except InvalidPath as e:
             raise HttpException(e, code=404)
         response_format = get_response_format()
+
+        if response_format == 'html':
+            # handle html in view
+            if path is None:
+                path = '/'
+            if path and path[-1] != '/':
+                path = path + '/'
+            return render_template('node.html', node=formatter.node, path=path, params=request.args)
+        # everything else must be handled by the formatter
         try:
             data = getattr(formatter, response_format)
         except AttributeError:
@@ -85,7 +94,7 @@ class NodeAPIv1(MethodView):
 api_view = NodeAPIv1.as_view('api_v1')
 app.add_url_rule(
     '/api/v1/',
-    defaults={'path': None},
+    defaults={'path': ''},
     view_func=api_view,
     methods=['GET', 'POST', 'PUT', 'DELETE'])
 app.add_url_rule(

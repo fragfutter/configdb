@@ -1,0 +1,21 @@
+<html>
+<head>
+	<title>configdb {{ node.path }}</title>
+</head>
+<body>
+	<h1>
+	{% for element in node.xpath %}
+	<a href="{{ url_for('api_v1', path=element.path, **params) }}">{% if loop.first %}ROOT{% else %}{{ element.label }}{% endif %}</a> /
+	{% endfor %}
+	</h1>
+	{% if node.is_branch %}
+	<ul>
+		{% for child in node.children | sort(attribute='label') %}
+		<li><a href="{{ url_for('api_v1', path=child.path, **params) }}">{{ child.label }}</a></li>
+		{% endfor %}
+	</ul>
+	{% else %}
+	{{ node.val }}
+	{% endif %}
+</body>
+</html>
