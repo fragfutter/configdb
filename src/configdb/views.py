@@ -4,6 +4,7 @@ from configdb.errors import HttpException, DecodeException, InvalidPath
 from configdb.formatter import Formatter
 from flask import request, Response, render_template
 from flask.views import MethodView
+import socket
 
 
 mimes = {
@@ -53,7 +54,18 @@ def decode_put():
 
 
 class NodeAPIv1(MethodView):
+    def path_replacer(self, path):
+        path = path.replace('HOSTADDR', request.remote_addr)
+        if 'HOSTNAME' in path:
+            try:
+                name = socket.gethostbyaddr(request.remote_addr)[0]
+            except socket.herror:
+                raise HttpException('failed to translate HOSTNAME, address %s non resolvable' % request.remote_addr)
+            path = path.replace('HOSTNAME', name)
+        return path
+
     def get(self, path):
+        path = self.path_replacer(path)
         try:
             formatter = Formatter(path)
         except InvalidPath as e:
@@ -75,9 +87,16 @@ class NodeAPIv1(MethodView):
         return Response(data, mimetype='text/plain')
 
     def delete(self, path):
-        return "delete"
+        path = self.path_replacer(path)
+        try:
+            formatter = Formatter(path)
+        except InvalidPath as e:
+            raise HttpException(e, code=404)
+        formatter.node.parent = None
+        return 'ok'
 
     def put(self, path):
+        path = self.path_replacer(path)
         put_format = decode_put()
         data = request.data.decode('utf-8')  # check if this works in python2
         if not hasattr(Formatter, put_format):

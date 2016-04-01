@@ -70,7 +70,7 @@ class Node(object):
         if self._parent and self in self._parent.children:
             # remove from old parent
             self._parent.children.remove(self)
-        if data:
+        if data is not None:
             # add to new parent
             data.children.append(self)
         self._parent = data
