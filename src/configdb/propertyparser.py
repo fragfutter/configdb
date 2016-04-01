@@ -96,19 +96,3 @@ class PropertyParser(object):
         except IndexError:
             pass
         return value
-
-
-if __name__ == '__main__':
-    p = PropertyParser()
-    data = """
-    foo.bar = 42
-    nested.array.0 = "a0"
-    nested.array.1 = "a1"
-    nested.array.2 = "a3"
-    pi = 3.141
-    a = "the beginning \
-        is here"
-    """
-    p.load(data)
-    print(p.data)
-    print(p.dump())

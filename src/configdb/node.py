@@ -163,15 +163,7 @@ class Node(object):
             result.append(node)
             node = node.parent
         result.reverse()
-        print(result)
         return result
 
 
 ROOT = Node('')
-
-if __name__ == '__main__':
-    x = Node.by_path('/foo/bar', create=True)
-    y = Node.by_path('/foo/list', create=True)
-    y.pickle(['eins', 'zwei', 'drei'])
-    Node.by_path('/foo/list/2').val = 'DREI'
-    print(ROOT.unpickle())
